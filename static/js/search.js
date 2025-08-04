@@ -35,11 +35,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 渲染视频列表
   function renderVideoList(videos, container) {
-    for (const video of videos) {
-      if (video.source && video.source.eps && video.source.eps.length > 0) {
-        console.log('视频数据完整:', video.source.eps[0].url);
-      }
-    }
     container.innerHTML = videos.map(video => (video.source && video.source.eps && video.source.eps.length > 0) ?
       `<div class="video-item" onclick="location.href='/player?name=${encodeURIComponent(video.name)}&eps=${encodeURIComponent(video.source.eps[0].name)}&url=${encodeURIComponent(video.source.eps[0].url)}'">
         ${video.name}
