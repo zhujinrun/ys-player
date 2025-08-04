@@ -16,8 +16,16 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // 切换信息面板
-  toggleBtn.addEventListener('click', function () {
+  toggleBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
     infoPanel.classList.toggle('collapsed');
+  });
+
+  // 点击视频区域时关闭信息面板
+  document.addEventListener('click', function (e) {
+    if (!infoPanel.contains(e.target) && !toggleBtn.contains(e.target)) {
+      infoPanel.classList.remove('collapsed');
+    }
   });
 
   // 加载视频信息
