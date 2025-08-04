@@ -5,11 +5,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YS Player - 搜索</title>
-  <link rel="stylesheet" href="/static/css/search.css">
+  <link rel="shortcut icon" type="images/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" href="/static/css/search.css" />
 </head>
 
 <body>
   <div class="container">
+    <div class="recommendation">
+      <div class="section">
+        <h3>热门推荐</h3>
+        <div id="hotList" class="video-list"></div>
+      </div>
+      <div class="section">
+        <h3>最新上线</h3>
+        <div id="newList" class="video-list"></div>
+      </div>
+    </div>
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="请输入影片名称..." autocomplete="off">
       <div id="searchResults" class="search-results"></div>

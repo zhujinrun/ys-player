@@ -10,6 +10,54 @@ body {
 }
 
 .container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 15px;
+}
+
+.recommendation {
+  margin-bottom: 30px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.section h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 15px;
+  padding-left: 10px;
+  border-left: 4px solid #007bff;
+}
+
+.video-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.video-item {
+  overflow: hidden;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.video-item:hover {
+  transform: translateY(-2px);
+}
+
+.video-item .title {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.container {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;

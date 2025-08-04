@@ -28,7 +28,10 @@ func NewVideoSourceService() *VideoSourceService {
 // GetVideoSource 获取视频源信息
 func (s *VideoSourceService) GetVideoSource(sourceName string) (*models.VideoResponse, error) {
 	// 构建请求 URL
-	url := fmt.Sprintf("%s?z=5117f1b038516d559d873674092a53e5&jx=%s&s1ig=11398&g=", s.apiURL, sourceName)
+	url := s.apiURL
+	if sourceName != "" {
+		url = fmt.Sprintf("%s?z=5117f1b038516d559d873674092a53e5&jx=%s&s1ig=11398&g=", s.apiURL, sourceName)
+	}
 
 	// 发送 GET 请求
 	resp, err := s.httpClient.Get(context.Background(), url)

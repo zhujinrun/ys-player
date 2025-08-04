@@ -1,7 +1,54 @@
 document.addEventListener('DOMContentLoaded', function () {
   const searchInput = document.getElementById('searchInput');
   const searchResults = document.getElementById('searchResults');
+  const hotList = document.getElementById('hotList');
+  const newList = document.getElementById('newList');
   let debounceTimer;
+
+  // 获取推荐列表
+  async function fetchRecommendations() {
+    let sessionData = sessionStorage.getItem('recommendations');
+    if (sessionData) {
+      const data = JSON.parse(sessionData);
+      if (data.hot) {
+        renderVideoList(data.hot, hotList);
+      }
+      if (data.new) {
+        renderVideoList(data.new, newList);
+      }
+      return;
+    }
+    try {
+      const response = await fetch('/api/video');
+      const data = await response.json();
+      sessionStorage.setItem('recommendations', JSON.stringify(data));
+      if (data.hot) {
+        renderVideoList(data.hot, hotList);
+      }
+      if (data.new) {
+        renderVideoList(data.new, newList);
+      }
+    } catch (error) {
+      console.error('获取推荐列表失败:', error);
+    }
+  }
+
+  // 渲染视频列表
+  function renderVideoList(videos, container) {
+    for (const video of videos) {
+      if (video.source && video.source.eps && video.source.eps.length > 0) {
+        console.log('视频数据完整:', video.source.eps[0].url);
+      }
+    }
+    container.innerHTML = videos.map(video => (video.source && video.source.eps && video.source.eps.length > 0) ?
+      `<div class="video-item" onclick="location.href='/player?name=${encodeURIComponent(video.name)}&eps=${encodeURIComponent(video.source.eps[0].name)}&url=${encodeURIComponent(video.source.eps[0].url)}'">
+        ${video.name}
+      </div>` :
+      `<div class="video-item" onclick="location.href='/player?name=${encodeURIComponent(video.name)}'">
+        ${video.name}
+      </div>`
+    ).join('');
+  }
 
   // 防抖函数
   function debounce(func, delay) {
@@ -68,6 +115,9 @@ document.addEventListener('DOMContentLoaded', function () {
       searchResults.style.display = 'none';
     }
   });
+
+  // 页面加载时获取推荐列表
+  fetchRecommendations();
 
   // 监听输入框聚焦事件
   searchInput.addEventListener('focus', function () {

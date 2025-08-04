@@ -24,12 +24,12 @@ func NewVideoSourceHandler() *VideoSourceHandler {
 func (h *VideoSourceHandler) GetVideoSource(c *gin.Context) {
 	// 获取查询参数
 	sourceName := c.Query("name")
-	if sourceName == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "视频名称不能为空",
-		})
-		return
-	}
+	// if sourceName == "" {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"error": "视频名称不能为空",
+	// 	})
+	// 	return
+	// }
 
 	// 调用视频源服务
 	result, err := h.videoService.GetVideoSource(sourceName)

@@ -1,14 +1,20 @@
 package main
 
 import (
+	"embed"
 	"fmt"
+	"io/fs"
 	"log"
+	"net/http"
 
 	"ys-player/api"
 	"ys-player/internal/config"
 
 	"github.com/gin-gonic/gin"
 )
+
+//go:embed static/*
+var staticFiles embed.FS
 
 func main() {
 	// 加载配置文件
@@ -22,10 +28,36 @@ func main() {
 	// 创建默认的 gin 引擎
 	r := gin.Default()
 
-	// 静态文件服务
-	r.Static("/static", "./static")
-	r.StaticFile("/", "./static/index.html")
-	r.StaticFile("/player", "./static/player.html")
+	// 静态文件服务 - 使用嵌入的文件系统
+	staticFS, err := fs.Sub(staticFiles, "static")
+	if err != nil {
+		log.Fatal("创建静态文件子系统失败:", err)
+	}
+
+	r.StaticFS("/static", http.FS(staticFS))
+
+	// 处理根路径和特定页面
+	r.GET("/", func(c *gin.Context) {
+		indexFile, err := staticFS.Open("index.html")
+		if err != nil {
+			c.Status(http.StatusNotFound)
+			return
+		}
+		defer indexFile.Close()
+
+		c.DataFromReader(http.StatusOK, -1, "text/html", indexFile, nil)
+	})
+
+	r.GET("/player", func(c *gin.Context) {
+		playerFile, err := staticFS.Open("player.html")
+		if err != nil {
+			c.Status(http.StatusNotFound)
+			return
+		}
+		defer playerFile.Close()
+
+		c.DataFromReader(http.StatusOK, -1, "text/html", playerFile, nil)
+	})
 
 	// 创建处理器
 	searchHandler := api.NewSearchHandler()

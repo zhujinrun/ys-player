@@ -25,6 +25,21 @@ func LoadConfig(configPath string) error {
 		return err
 	}
 
+	// 检查文件是否存在
+	if _, err := os.Stat(absPath); os.IsNotExist(err) {
+		// 文件不存在，直接返回，使用默认配置
+		GlobalConfig = Config{
+			Server: ServerConfig{
+				Port: 8080,
+				Mode: "release",
+			},
+		}
+		return nil
+	} else if err != nil {
+		// 其他错误
+		return err
+	}
+
 	// 读取配置文件
 	file, err := os.ReadFile(absPath)
 	if err != nil {

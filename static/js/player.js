@@ -9,11 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
   // 获取URL参数
   const urlParams = new URLSearchParams(window.location.search);
   const videoName = urlParams.get('name');
-
-  if (!videoName) {
-    alert('未指定视频名称');
-    return;
-  }
+  const videoUrl = urlParams.get('url');
+  const videoEps = urlParams.get('eps');
 
   // 切换信息面板
   toggleBtn.addEventListener('click', function (e) {
@@ -27,6 +24,21 @@ document.addEventListener('DOMContentLoaded', function () {
       infoPanel.classList.remove('collapsed');
     }
   });
+
+  if (videoUrl) {
+    // 如果提供了视频URL，直接播放
+    videoTitle.textContent = videoName;
+    videoYear.textContent = videoEps;
+    // 清空剧集列表
+    episodeList.innerHTML = '';
+    playVideo(videoUrl);
+    return;
+  }
+
+  if (!videoName) {
+    alert('未指定视频名称');
+    return;
+  }
 
   // 加载视频信息
   async function loadVideoInfo() {
