@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YS Player - 播放</title>
+  <link rel="stylesheet" href="/static/css/player.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="player-container">
+    <!-- 视频播放区域 -->
+    <div class="video-container">
+      <iframe id="videoPlayer" allowfullscreen></iframe>
+    </div>
+
+    <!-- 信息面板 -->
+    <div class="info-panel" id="infoPanel">
+      <div class="panel-header">
+        <div class="video-title" id="videoTitle"></div>
+        <button class="toggle-btn" id="toggleBtn">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <!-- 视频信息 -->
+      <div class="video-info" id="videoInfo">
+        <div class="video-year" id="videoYear"></div>
+      </div>
+
+      <!-- 剧集列表 -->
+      <div class="episode-list" id="episodeList"></div>
+    </div>
+  </div>
+  <script src="/static/js/player.js"></script>
+</body>
+
+</html>
