@@ -107,7 +107,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 播放视频
   function playVideo(url) {
-    videoPlayer.src = "https://m3u8player.org/player.html?url=" + url;
+    if (!window.m3u8player) {
+      window.m3u8player = sessionStorage.getItem('m3u8player');
+    }
+    videoPlayer.src = window.m3u8player + url;
   }
 
   // 加载视频信息

@@ -1,6 +1,7 @@
 {
   "server": {
     "port": 8080,
+    "player_url": "https://m3u8player.org/player.html?url=",
     "mode": "debug"
   }
 }

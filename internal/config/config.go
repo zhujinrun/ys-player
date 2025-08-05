@@ -11,8 +11,9 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port int    `json:"port"`
-	Mode string `json:"mode"`
+	Port      int    `json:"port"`
+	PlayerUrl string `json:"player_url"`
+	Mode      string `json:"mode"`
 }
 
 var GlobalConfig Config
@@ -27,12 +28,17 @@ func LoadConfig(configPath string) error {
 
 	// 检查文件是否存在
 	if _, err := os.Stat(absPath); os.IsNotExist(err) {
-		// 文件不存在，直接返回，使用默认配置
+		// 文件不存在，使用默认配置
 		GlobalConfig = Config{
 			Server: ServerConfig{
-				Port: 8080,
-				Mode: "release",
+				Port:      8080,
+				PlayerUrl: "https://m3u8player.org/player.html?url=",
+				Mode:      "release",
 			},
+		}
+		// 并且将默认配置保存到文件中
+		if saveErr := saveConfig(absPath, GlobalConfig); saveErr != nil {
+			return saveErr
 		}
 		return nil
 	} else if err != nil {
@@ -52,4 +58,22 @@ func LoadConfig(configPath string) error {
 	}
 
 	return nil
+}
+
+// saveConfig 将配置保存到指定路径
+func saveConfig(path string, config Config) error {
+	// 确保目录存在
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+
+	// 将配置序列化为JSON
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	// 写入文件
+	return os.WriteFile(path, data, 0644)
 }
