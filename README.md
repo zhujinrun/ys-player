@@ -30,11 +30,20 @@ ys-player/
 
 - 项目使用 Go 模块进行依赖管理
 - 使用 Gin 框架作为 Web 服务器
+- [Vip视频在线解析](https://tv.wandhi.com/go.html)
 
 ## 发布
 
 项目使用 Go 语言开发，因此可以使用 Go 的标准工具进行编译和打包。
 
+* -s：去掉符号表
+* -w：去掉 DWARF 调试信息
+* -9：为最高压缩率
+
 ```bash
 go build -o release/ys-player.exe
+
+go build -ldflags="-s -w" -o release/ys-player-mini.exe
+
+upx.exe -9 release/ys-player-mini.exe
 ```
