@@ -21,10 +21,16 @@ ys-player/
    ```bash
    go run main.go
    ```
-4. 访问测试接口：
+4. 打开浏览器：
    ```
-   http://localhost:8080/ping
+   http://localhost:8080
    ```
+5. 访问项目：
+
+  ![server.png](https://youke1.picui.cn/s1/2025/08/05/6891bca434663.png)
+  ![client.png](https://youke1.picui.cn/s1/2025/08/05/6891bca400efa.png)
+  ![mv.png](https://youke1.picui.cn/s1/2025/08/05/6891be4de3db6.png)
+  ![tv.png](https://youke1.picui.cn/s1/2025/08/05/6891be4d6533c.png)
 
 ## 开发
 
