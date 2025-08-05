@@ -30,7 +30,8 @@ func (s *VideoSourceService) GetVideoSource(sourceName string) (*models.VideoRes
 	// 构建请求 URL
 	url := s.apiURL
 	if sourceName != "" {
-		url = fmt.Sprintf("%s?z=5117f1b038516d559d873674092a53e5&jx=%s&s1ig=11398&g=", s.apiURL, sourceName)
+		z, s1ig := utils.BuildSignature()
+		url = fmt.Sprintf("%s?z=%s&jx=%s&s1ig=%d&g=", s.apiURL, z, sourceName, s1ig)
 	}
 
 	// 发送 GET 请求

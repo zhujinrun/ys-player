@@ -46,4 +46,6 @@ go build -o release/ys-player.exe
 go build -ldflags="-s -w" -o release/ys-player-mini.exe
 
 upx.exe -9 release/ys-player-mini.exe
+
+go build -ldflags="-s -w" -o release/ys-player-mini.exe && upx.exe -9 release/ys-player-mini.exe
 ```
