@@ -12,7 +12,6 @@ type Config struct {
 
 type ServerConfig struct {
 	Port      int    `json:"port"`
-	PlayerUrl string `json:"player_url"`
 	Mode      string `json:"mode"`
 }
 
@@ -32,7 +31,6 @@ func LoadConfig(configPath string) error {
 		GlobalConfig = Config{
 			Server: ServerConfig{
 				Port:      8080,
-				PlayerUrl: "https://m3u8player.org/player.html?url=",
 				Mode:      "release",
 			},
 		}

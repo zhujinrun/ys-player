@@ -87,16 +87,9 @@ func main() {
 	videoHandler := api.NewVideoSourceHandler()
 
 	// 注册路由
-	r.GET("/ping", func(c *gin.Context) {
+	r.GET("/api/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
-		})
-	})
-
-	// 添加播放路由
-	r.GET("/api/player", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"url": config.GlobalConfig.Server.PlayerUrl,
 		})
 	})
 

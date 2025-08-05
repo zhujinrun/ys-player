@@ -30,3 +30,11 @@ ys-player/
 
 - 项目使用 Go 模块进行依赖管理
 - 使用 Gin 框架作为 Web 服务器
+
+## 发布
+
+项目使用 Go 语言开发，因此可以使用 Go 的标准工具进行编译和打包。
+
+```bash
+go build -o release/ys-player.exe
+```

@@ -33,28 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // 获取播放器地址
-  async function fetchPlayer() {
-    let sessionData = sessionStorage.getItem('m3u8player');
-    if (sessionData) {
-      window.m3u8player = sessionData;
-      return;
-    }
-    try {
-      const response = await fetch(`/api/player`);
-      if (!response.ok) {
-        throw new Error('获取播放地址失败');
-      }
-
-      const data = await response.json();
-      sessionStorage.setItem('m3u8player', data.url);
-      window.m3u8player = data.url;
-    } catch (error) {
-      console.error('加载播放地址出错:', error);
-      alert('加载播放地址失败');
-    }
-  }
-
   // 渲染视频列表
   function renderVideoList(videos, container) {
     container.innerHTML = videos.map(video => (video.source && video.source.eps && video.source.eps.length > 0) ?
@@ -133,8 +111,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // 页面加载时获取播放器
-  fetchPlayer();
   // 页面加载时获取推荐列表
   fetchRecommendations();
 

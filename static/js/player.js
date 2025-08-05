@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const videoPlayer = document.getElementById('videoPlayer');
+  const video = document.getElementById('video');
   const videoTitle = document.getElementById('videoTitle');
   const videoYear = document.getElementById('videoYear');
   const episodeList = document.getElementById('episodeList');
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
     videoYear.textContent = videoEps;
     // 清空剧集列表
     episodeList.innerHTML = '';
-    playVideo(videoUrl);
+    playM3u8(videoUrl);
     return;
   }
 
@@ -78,12 +78,12 @@ document.addEventListener('DOMContentLoaded', function () {
         episodeList.appendChild(episodeItem);
       });
       // 自动播放第一集
-      playVideo(videoData.source.eps[0].url);
+      playM3u8(videoData.source.eps[0].url);
     } else if (data.type === 'movie' && videoData.source.eps && videoData.source.eps.length > 0) {
       // 电影：通常只有一个播放源
       const episodeItem = createEpisodeItem(videoData.source.eps[0], true);
       episodeList.appendChild(episodeItem);
-      playVideo(videoData.source.eps[0].url);
+      playM3u8(videoData.source.eps[0].url);
     }
   }
 
@@ -100,17 +100,36 @@ document.addEventListener('DOMContentLoaded', function () {
       // 添加当前剧集的活动状态
       item.classList.add('active');
       // 播放视频
-      playVideo(episode.url);
+      playM3u8(episode.url);
     });
     return item;
   }
 
-  // 播放视频
-  function playVideo(url) {
-    if (!window.m3u8player) {
-      window.m3u8player = sessionStorage.getItem('m3u8player');
+  // 播放m3u8视频
+  function playM3u8(url) {
+    let m3u8Url = decodeURIComponent(url);
+    if (Hls.isSupported()) {
+      var hls = new Hls({
+        // debug: true
+      });
+      hls.loadSource(m3u8Url);
+      hls.attachMedia(video);
+      // Fired when MediaSource has been successfully attached to media element
+      // hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+      //   video.muted = true;
+      //   video.play();
+      // });
+      // Fired after manifest has been parsed
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        video.muted = true;
+        video.play();
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = m3u8Url;
+      video.addEventListener('canplay', function () {
+        video.play();
+      });
     }
-    videoPlayer.src = window.m3u8player + url;
   }
 
   // 加载视频信息
