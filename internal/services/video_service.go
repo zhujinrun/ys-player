@@ -34,6 +34,8 @@ func (s *VideoSourceService) GetVideoSource(sourceName string) (*models.VideoRes
 		url = fmt.Sprintf("%s?z=%s&jx=%s&s1ig=%d&g=", s.apiURL, z, sourceName, s1ig)
 	}
 
+	// println("video_url: ", url)
+
 	// 发送 GET 请求
 	resp, err := s.httpClient.Get(context.Background(), url)
 	if err != nil {

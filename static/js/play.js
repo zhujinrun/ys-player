@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const video = document.getElementById('video');
   const videoTitle = document.getElementById('videoTitle');
   const videoYear = document.getElementById('videoYear');
+  const videoStart = document.getElementById('videoStart');
+  const videoEnd = document.getElementById('videoEnd');
   const episodeList = document.getElementById('episodeList');
   const infoPanel = document.getElementById('infoPanel');
   const toggleBtn = document.getElementById('toggleBtn');
@@ -25,10 +27,92 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  document.addEventListener('keydown', function (event) {
+    switch (event.key) {
+      case 'ArrowUp': // 遥控器上键
+        console.log('上键被按下');
+        // if (video.volumn <= 90) {
+        //   video.volumn += 10;
+        // } else {
+        //   video.volumn = 100;
+        // }
+        setDuration(parseInt(video.currentTime));
+        break;
+      case 'ArrowDown': // 遥控器下键
+        console.log('下键被按下');
+        // if (video.volumn >= 10) {
+        //   video.volumn -= 10;
+        // } else {
+        //   video.volumn = 0;
+        // }
+        setDuration(parseInt(video.currentTime), true);
+        break;
+      case 'ArrowLeft': // 遥控器左键
+        // console.log('左键被按下');
+        if (video.currentTime >= 15) {
+          video.currentTime -= 15;
+        } else {
+          video.currentTime = 0;
+        }
+        break;
+      case 'ArrowRight': // 遥控器右键
+        // console.log('右键被按下');
+        if (video.currentTime < video.duration) {
+          video.currentTime += 15;
+        } else {
+          video.currentTime = video.duration;
+        }
+        break;
+      case ' ':
+      case 'Space':
+      case 'Enter': // 遥控器确认键
+        // console.log('确认键被按下');
+        video.paused ? video.play() : video.pause();
+        break;
+      case 'Escape':
+      case 'Backspace': // 遥控器返回键
+        // console.log('返回键被按下');
+        window.history.back();
+        break;
+      default:
+        console.log(`[${event.key}]键被按下`);
+    }
+  });
+
+  video.addEventListener('loadedmetadata', function () {
+    if (!isNaN(video.duration)) {
+      sessionStorage.setItem('videoDuration', video.duration);
+    }
+  });
+
+  video.addEventListener('timeupdate', function () {
+    // console.log(`timeupdate 获取视频时长成功: ${video.duration}秒`);
+    let skipHead = 0, skipTail = 0;
+    const sessionStartData = sessionStorage.getItem('videoStart');
+    if (sessionStartData) {
+      skipHead = parseInt(sessionStartData);
+      videoStart.textContent = `片头: ${secondsToHms(skipHead)}`;
+    }
+    const sessionEndData = sessionStorage.getItem('videoEnd');
+    if (sessionEndData) {
+      skipTail = parseInt(sessionEndData);
+      videoEnd.textContent = `片尾: ${secondsToHms(parseInt(video.duration) - skipTail)}`;
+    }
+    // 1. 片头
+    if (video.currentTime > 0 && skipHead > 0 && video.currentTime < skipHead) {
+      video.currentTime = skipHead;
+    }
+    // 2. 片尾
+    if (video.currentTime > 0 && skipTail > 0 && video.currentTime >= skipTail) {
+      video.currentTime = video.duration;
+    }
+  })
+
   if (videoUrl) {
     // 如果提供了视频URL，直接播放
     videoTitle.textContent = videoName;
-    videoYear.textContent = videoEps;
+    videoYear.textContent = "剧集：" + videoEps;
+
     // 清空剧集列表
     episodeList.innerHTML = '';
     playM3u8(videoUrl);
@@ -130,6 +214,29 @@ document.addEventListener('DOMContentLoaded', function () {
         video.play();
       });
     }
+  }
+
+  // 设置片头/片尾时长
+  function setDuration(duration, videoEnd = false) {
+    if (videoEnd) {
+      sessionStorage.setItem('videoEnd', parseInt(duration));
+    } else {
+      sessionStorage.setItem('videoStart', parseInt(duration));
+    }
+  }
+
+  function secondsToHms(seconds) {
+    // 计算小时数
+    const h = Math.floor(seconds / 3600);
+    // 计算剩余的秒数
+    const m = Math.floor((seconds % 3600) / 60);
+    // 计算最终的秒数
+    const s = seconds % 60;
+    // 格式化输出，使得小时、分钟和秒数总是两位数
+    const hDisplay = h > 0 ? (h < 10 ? '0' + h : h) + ':' : '00:';
+    const mDisplay = m > 0 ? (m < 10 ? '0' + m : m) + ':' : '00:';
+    const sDisplay = s > 0 ? (s < 10 ? '0' + s : s) : '00';
+    return hDisplay + mDisplay + sDisplay;
   }
 
   // 加载视频信息

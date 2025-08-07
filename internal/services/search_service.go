@@ -30,6 +30,8 @@ func (s *SearchService) Search(keyword string) ([]models.SearchResult, error) {
 	// 构建请求 URL（添加关键字作为查询参数）
 	url := fmt.Sprintf("%s?k=%s", s.apiURL, keyword)
 
+	// println("search_url: ", url)
+
 	// 发送 GET 请求
 	resp, err := s.httpClient.Get(context.Background(), url)
 	if err != nil {

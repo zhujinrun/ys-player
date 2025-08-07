@@ -5,6 +5,25 @@ document.addEventListener('DOMContentLoaded', function () {
   const newList = document.getElementById('newList');
   let debounceTimer;
 
+  const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isAndroid = /Android/gi.test(navigator.userAgent);
+
+  if (isiOS) {
+    document.body.addEventListener('focusin', () => {
+      setTimeout(() => {
+        document.body.scrollTop = document.body.scrollHeight;
+      }, 100);
+    });
+  } else if (isAndroid) {
+    window.addEventListener('resize', () => {
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+        setTimeout(() => {
+          document.activeElement.scrollIntoView(false);
+        }, 100);
+      }
+    });
+  }
+
   // 获取推荐列表
   async function fetchRecommendations() {
     let sessionData = sessionStorage.getItem('recommendations');

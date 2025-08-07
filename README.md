@@ -36,7 +36,7 @@ ys-player/
 
 - 项目使用 Go 模块进行依赖管理
 - 使用 Gin 框架作为 Web 服务器
-- [Vip视频在线解析](https://tv.wandhi.com/go.html)
+- [Vip视频在线解析](https://im1907.top/qwq/)
 
 ## 发布
 
