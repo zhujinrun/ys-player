@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  // 统一监听 loadedmetadata
   video.addEventListener('loadedmetadata', function () {
     if (!isNaN(video.duration)) {
       sessionStorage.setItem('videoDuration', video.duration);
@@ -184,15 +185,15 @@ document.addEventListener('DOMContentLoaded', function () {
       // 添加当前剧集的活动状态
       item.classList.add('active');
       // 播放视频
-      playM3u8(episode.url);
+      playM3u8(episode.url, false);
     });
     return item;
   }
 
   // 播放m3u8视频
-  function playM3u8(url) {
+  function playM3u8(url, autoplay = true) {
     let m3u8Url = decodeURIComponent(url);
-    if (Hls.isSupported()) {
+    if (Hls.isSupported()) { // 1) Hls.js 分支
       var hls = new Hls({
         // debug: true
       });
@@ -200,19 +201,22 @@ document.addEventListener('DOMContentLoaded', function () {
       hls.attachMedia(video);
       // Fired when MediaSource has been successfully attached to media element
       // hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-      //   video.muted = true;
+      //   video.muted = autoplay;
       //   video.play();
       // });
       // Fired after manifest has been parsed
-      hls.on(Hls.Events.MANIFEST_PARSED, function () {
-        video.muted = true;
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        if (autoplay) {
+          video.muted = autoplay;
+        }
         video.play();
       });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) { // 原生 HLS（Safari）分支
       video.src = m3u8Url;
-      video.addEventListener('canplay', function () {
-        video.play();
-      });
+      if (autoplay) {
+        video.muted = autoplay;
+      }
+      video.play();
     }
   }
 
