@@ -54,4 +54,30 @@ go build -ldflags="-s -w" -o release/ys-player-mini.exe
 upx.exe -9 release/ys-player-mini.exe
 
 go build -ldflags="-s -w" -o release/ys-player-mini.exe && upx.exe -9 release/ys-player-mini.exe
+
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o release/ys-player-mini && upx.exe -9 release/ys-player-mini
+```
+
+### Linux systemd 服务管理
+```bash
+sudo vi /etc/systemd/system/ys-player.service
+
+[Unit]
+Description=YS Player
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/service
+ExecStart=/root/service/ys-player-mini
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+sudo systemctl daemon-reload
+sudo systemctl start ys-player
+sudo systemctl enable ys-player
+sudo systemctl status ys-player
+sudo journalctl -u ys-player
 ```

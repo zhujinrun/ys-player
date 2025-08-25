@@ -1,0 +1,55 @@
+name: Build & Release Go Binary
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  releases-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # build and publish in parallel: linux/amd64, linux/arm64, windows/amd64
+        goos: [linux, windows]
+        goarch: [amd64, arm64]
+        exclude:
+          - goarch: arm64
+            goos: windows
+
+    steps:
+      - name: Release tag
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: |
+            自动生成 Binary  
+            对应提交：${{ github.sha }}
+          draft: false
+          prerelease: false      
+
+      - uses: actions/checkout@v4
+
+      - name: Build & upload
+        uses: wangyoucao577/go-release-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          goversion: "1.22.12"
+          ldflags: -s -w
+          binary_name: ys-player-mini
+          executable_compression: upx -9
+          asset_name: ys-player-mini-${{ matrix.goos }}-${{ matrix.goarch }}
+          # extra_files: "README.md LICENSE"
+          compress_assets: true
+          md5sum: false
+          overwrite: true
