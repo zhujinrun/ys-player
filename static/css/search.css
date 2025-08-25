@@ -15,10 +15,6 @@ body {
   padding: 0 15px;
 }
 
-.recommendation {
-  margin-bottom: 30px;
-}
-
 .section {
   margin-bottom: 20px;
 }
@@ -28,33 +24,38 @@ body {
   color: #333;
   margin-bottom: 15px;
   padding-left: 10px;
+}
+
+.section h3.hot {
+  border-left: 4px solid #dc3545;
+}
+
+.section h3.new {
   border-left: 4px solid #007bff;
 }
 
 .video-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 2px;
+  gap: 5px;
   margin-bottom: 10px;
 }
 
 .video-item {
+  font-size: 16px;
+  color: #222;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   transition: transform 0.2s;
   cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  text-align: center;
 }
 
 .video-item:hover {
   transform: translateY(-2px);
-}
-
-.video-item .title {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .container {
@@ -66,6 +67,8 @@ body {
 .search-box {
   position: relative;
   width: 100%;
+  margin-top: 20px;
+  margin-bottom: 30px;
 }
 
 #searchInput {
