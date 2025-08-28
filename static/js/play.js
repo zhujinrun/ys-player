@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   const video = document.getElementById('video');
   const videoTitle = document.getElementById('videoTitle');
+  const videoType = document.getElementById('videoType');
   const videoYear = document.getElementById('videoYear');
   const videoStart = document.getElementById('videoStart');
   const videoEnd = document.getElementById('videoEnd');
@@ -10,9 +11,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 获取URL参数
   const urlParams = new URLSearchParams(window.location.search);
-  const videoName = urlParams.get('name');
-  const videoUrl = urlParams.get('url');
-  const videoEps = urlParams.get('eps');
+  const name = urlParams.get('name');
+
+  if (!name) {
+    alert('请指定视频名称');
+    return;
+  }
+
+  console.debug('准备播放:', name);
+
+  const year = urlParams.get('year');
+  const eps = urlParams.get('eps');
+
+  // 数据
+  let _year = year ?? '';
+  let _type = eps == null ? '连续剧' : '电影';
+
+  let _sourceIndex = 0;
+  let _sources = [];
+  let _epIndex = 0;
+  let _eps = [];
+
+  if (eps) {
+    // 如果提供了视频源，直接播放
+    _sources = [{ name: name, year: _year, source: { eps: JSON.parse(decodeURIComponent(atob(eps))) } }]
+    playSource();
+  } else {
+    // 加载视频信息，并播放第一个视频源
+    loadVideoInfo(name);
+  }
 
   // 切换信息面板
   toggleBtn.addEventListener('click', function (e) {
@@ -109,72 +136,96 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   })
 
-  if (videoUrl) {
-    // 如果提供了视频URL，直接播放
-    videoTitle.textContent = videoName;
-    videoYear.textContent = "剧集：" + videoEps;
-
-    // 清空剧集列表
-    episodeList.innerHTML = '';
-    playM3u8(videoUrl);
-    return;
-  }
-
-  if (!videoName) {
-    alert('未指定视频名称');
-    return;
-  }
-
   // 加载视频信息
-  async function loadVideoInfo() {
+  async function loadVideoInfo(name) {
     try {
-      const response = await fetch(`/api/video?name=${encodeURIComponent(videoName)}`);
+      const response = await fetch(`/api/video?name=${encodeURIComponent(name)}`);
       if (!response.ok) {
         throw new Error('获取视频信息失败');
       }
-
       const data = await response.json();
-      displayVideoInfo(data);
+      console.debug('视频数据:', data);
+
+      _sources = data.data ?? [];
+
+      if (data.type == 'movie') {
+        _type = '电影';
+        // 处理电影类型
+        if (_sources.length > 0) {
+          await playSource();
+        } else {
+          console.debug('没有找到任何电影: ', _sources);
+        }
+      } else if (data.type == 'tv') {
+        _type = '电视剧';
+        // 处理电视剧类型
+        if (_sources.length > 0) {
+          await playSource();
+        } else {
+          console.debug('没有找到任何剧集: ', _sources);
+        }
+      } else {
+        _type = '未知';
+        console.debug('未知视频类型: ', data);
+      }
     } catch (error) {
       console.error('加载视频信息出错:', error);
       alert('加载视频信息失败');
     }
   }
 
-  // 显示视频信息和剧集列表
-  function displayVideoInfo(data) {
-    if (!data || !data.data || data.data.length === 0) {
-      alert('未找到视频信息');
-      return;
+  // 播放视频源
+  async function playSource(index = 0) {
+    console.debug('正在播放源：', index);
+
+    _eps = _sources[index].source.eps;
+    _year = _sources[index].year;
+
+    videoTitle.textContent = name;
+    if (_sources.length > 1) {
+      videoTitle.style.cursor = "pointer";
+      videoTitle.setAttribute("title", "点击可切换视频源");
+      videoTitle.addEventListener("click", function () {
+        changeSource();
+      });
+    }
+    if (_type && _type.length > 0) {
+      videoType.textContent = "类型：" + _type;
+    }
+    if (_year && _year.length > 0) {
+      videoYear.textContent = "年份：" + _year;
     }
 
-    const videoData = data.data[0];
-    videoTitle.textContent = videoData.name;
-    videoYear.textContent = "年份：" + videoData.year;
-
     // 清空剧集列表
+    _epIndex = 0;
     episodeList.innerHTML = '';
 
-    // 根据类型处理剧集
-    if (data.type === 'tv' && videoData.source.eps && videoData.source.eps.length > 0) {
-      // 电视剧：显示所有剧集
-      videoData.source.eps.forEach((ep, index) => {
-        const episodeItem = createEpisodeItem(ep, index === 0);
+    if (_eps && _eps.length > 0) {
+      _eps.forEach((ep, index) => {
+        const episodeItem = createEpisodeItem(ep, index);
         episodeList.appendChild(episodeItem);
       });
-      // 自动播放第一集
-      playM3u8(videoData.source.eps[0].url);
-    } else if (data.type === 'movie' && videoData.source.eps && videoData.source.eps.length > 0) {
-      // 电影：通常只有一个播放源
-      const episodeItem = createEpisodeItem(videoData.source.eps[0], true);
-      episodeList.appendChild(episodeItem);
-      playM3u8(videoData.source.eps[0].url);
+
+      // 自动播放
+      playM3u8(_eps[0].url);
     }
   }
 
+  // 切换视频源
+  async function changeSource() {
+    // 增加 _sourceIndex
+    _sourceIndex++;
+    // 如果 _sourceIndex 超出了 _sources 的长度，重置为 0
+    if (_sourceIndex >= _sources.length) {
+      _sourceIndex = 0;
+    }
+    await playSource(_sourceIndex);
+  }
+
   // 创建剧集项
-  function createEpisodeItem(episode, isActive) {
+  function createEpisodeItem(episode, index) {
     const item = document.createElement('div');
+    const isActive = index === _epIndex;
     item.className = `episode-item${isActive ? ' active' : ''}`;
     item.textContent = episode.name;
     item.addEventListener('click', function () {
@@ -184,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       // 添加当前剧集的活动状态
       item.classList.add('active');
+      _epIndex = index;
       // 播放视频
       playM3u8(episode.url, false);
     });
@@ -211,12 +263,35 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         video.play();
       });
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        console.error('HLS error:', data);
+        if (data.fatal) {
+          // switch (data.type) {
+          //   case Hls.ErrorTypes.NETWORK_ERROR:
+          //     hls.startLoad();
+          //     break;
+          //   case Hls.ErrorTypes.MEDIA_ERROR:
+          //     hls.recoverMediaError();
+          //     break;
+          //   default:
+          //     hls.destroy();
+          //     break;
+          // }
+          const _changeSource = confirm(_sources.length > 1 ? "视频播放出错，是否换源播放？" : "视频播放出错，是否尝试播放？");
+          if (_changeSource) {
+            _sources.length > 1 ? changeSource() : playSource();
+          }
+        }
+      });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) { // 原生 HLS（Safari）分支
       video.src = m3u8Url;
       if (autoplay) {
         video.muted = autoplay;
       }
       video.play();
+    } else {
+      console.error('Your browser does not support HLS playback.');
+      alert('浏览器不支持 HLS 播放');
     }
   }
 
@@ -242,7 +317,4 @@ document.addEventListener('DOMContentLoaded', function () {
     const sDisplay = s > 0 ? (s < 10 ? '0' + s : s) : '00';
     return hDisplay + mDisplay + sDisplay;
   }
-
-  // 加载视频信息
-  loadVideoInfo();
 });

@@ -55,10 +55,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // 渲染视频列表
   function renderVideoList(videos, container) {
     container.innerHTML = videos.map(video => (video.source && video.source.eps && video.source.eps.length > 0) ?
-      `<div class="video-item" onclick="location.href='/play?name=${encodeURIComponent(video.name)}&eps=${encodeURIComponent(video.source.eps[0].name)}&url=${encodeURIComponent(video.source.eps[0].url)}'">
+      `<div class="video-item" onclick="location.href='/play?name=${encodeURIComponent(video.name)}&year=${video.year}&eps=${btoa(encodeURIComponent(JSON.stringify(video.source.eps)))}'">
         ${video.name}
       </div>` :
-      `<div class="video-item" onclick="location.href='/play?name=${encodeURIComponent(video.name)}'">
+      `<div class="video-item" onclick="location.href='/play?name=${encodeURIComponent(video.name)}&year=${video.year}'">
         ${video.name}
       </div>`
     ).join('');
